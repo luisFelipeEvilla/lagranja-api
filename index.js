@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('./db/index');
 
-const signup = require('./routes/signup');
+const signup = require('./routes/users');
 
 const { SERVER_PORT } = require('./config');
 
