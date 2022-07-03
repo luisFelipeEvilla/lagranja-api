@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const { jwtSecret } = require('../config');
+import jwt from "jsonwebtoken";
+import {jwtSecret} from '../config.js';
 
 const verifyToken = (req, res, next) => {
     if (!req.headers.authorization) return res.status(400).json({message: "please submit a bearer token"})
@@ -18,4 +18,4 @@ const verifyToken = (req, res, next) => {
     return next();
   };
 
-module.exports = verifyToken;
+export default verifyToken;

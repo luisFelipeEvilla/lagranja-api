@@ -1,14 +1,14 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 
 // data base models
-const User = require('../db/models/user');
+import User from '../db/models/user.js';
 
 // configuration settings
-const { jwtSecret } = require('../config');
+import {jwtSecret} from '../config.js';
 
-const router = express.Router();
+const router = Router();
 
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
@@ -20,8 +20,8 @@ router.post('/signup', (req, res) => {
             password
         })
 
-        const salt = bcrypt.genSaltSync(10);
-        user.password = bcrypt.hashSync(password, salt);
+        const salt = genSaltSync(10);
+        user.password = hashSync(password, salt);
 
         user.save((err, user) => {
             if (err) return res.status(500).send(err.message);
@@ -46,7 +46,7 @@ router.post('/signin', async (req, res) => {
         const user = await User.findOne({ username });
 
         if (user) {
-            const authenticate = bcrypt.compareSync(password, user.password);
+            const authenticate = compareSync(password, user.password);
 
             const token = jwt.sign(
                 { _id: user._id, username: user.username },
@@ -63,4 +63,4 @@ router.post('/signin', async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router;

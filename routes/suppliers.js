@@ -1,8 +1,8 @@
-const express = require('express');
-const Supplier = require('../db/models/supplier');
-const Product = require('../db/models/product');
+import { Router } from 'express';
+import Supplier from '../db/models/supplier.js';
+import Product from '../db/models/product.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', (req, res) => {
     Supplier.find((err, suppliers) => {
@@ -102,4 +102,4 @@ router.put('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

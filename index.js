@@ -1,12 +1,12 @@
-const express = require('express');
-const db = require('./db/index');
+import express from 'express';
+import db from './db/index.js';
 
-const users = require('./routes/users');
-const suppliers = require('./routes/suppliers');
+import users from './routes/users.js';
+import suppliers from './routes/suppliers.js';
 
-const auth = require('./middlewares/auth');
+import auth from './middlewares/auth.js';
 
-const { SERVER_PORT } = require('./config');
+import { SERVER_PORT } from './config.js';
 
 db();
 

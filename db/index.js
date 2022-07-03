@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_URI } = require('../config');
+import mongoose from 'mongoose';
+import { DB_URI } from '../config.js';
 
 const connect = () => {
     mongoose.connect(DB_URI, {
@@ -13,4 +13,4 @@ const connect = () => {
     })
 }
 
-module.exports = connect;
+export default connect;
