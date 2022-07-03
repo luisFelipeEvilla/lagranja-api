@@ -3,8 +3,8 @@ import uniqueValidator from 'mongoose-unique-validator';
 
 const userSchema = mongoose.Schema({
     username: {type: String, required: true, unique: true},
-    password: String,
-    admin: Boolean 
+    password: {type: String, required: true, unique: true},
+    isAdmin: {type: Boolean, required: true, default: false}
 })
 
 userSchema.plugin(uniqueValidator);

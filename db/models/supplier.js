@@ -7,7 +7,8 @@ const supplierSchema = mongoose.Schema({
     products: [{ 
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Product'
-    }]
+    }],
+    isActive: {type: Boolean, default: true}
 })
 
 
