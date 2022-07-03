@@ -2,13 +2,12 @@ const jwt = require("jsonwebtoken");
 const { jwtSecret } = require('../config');
 
 const verifyToken = (req, res, next) => {
-    if (!token) {
-        return res.status(400).json({message: "please submit a token"})
-    }
+    if (!req.headers.authorization) return res.status(400).json({message: "please submit a bearer token"})
+
     const token = req.headers.authorization.split(" ")[1].trim();
-    if (!token) {
-      res.status(403).send("A token is required for authentication");
-    }
+
+    if (!token) res.status(403).send("A token is required for authentication");
+
     try {
       const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded;
