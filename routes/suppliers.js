@@ -30,4 +30,30 @@ router.post('/', (req, res) => {
     }
 })
 
+router.put('/', async (req, res) => {
+    const { _id, firstName, lastName } = req.body;
+
+    if (firstName && lastName) { 
+        const supplier = {
+            firstName,
+            lastName
+        }
+
+        const options = {
+            new: true
+        }
+        Supplier.findOneAndUpdate({_id}, supplier, options, (err, supplier) => {
+            if (err)  return res.status(500).json({message: err});
+
+            if (supplier) {
+                res.status(200).json(supplier);
+            } else {
+                return res.status(404).json({message: 'Supplier not found'});
+            }
+        });
+    } else {
+        return res.status(400).json({message: 'You should pass a first name and last name'})
+    }
+});
+
 module.exports = router;
