@@ -1,41 +1,35 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { genSaltSync, hashSync, compareSync } from 'bcrypt';
+import { compareSync } from 'bcrypt';
 
-// data base models
-import User from '../db/models/user.js';
+// data base controllers
+import { createUser, getUser } from '../db/controllers/user.js';
+
+// errors 
+import { ResourceAlreadyExistsError } from '../Errors/errors.js';
 
 // configuration settings
-import {jwtSecret} from '../config.js';
+import generateJWT from '../utils/generateJWT.js';
+import user from '../db/models/user.js';
 
 const router = Router();
 
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     const { username, password } = req.body;
 
     if (username && password) {
+        try {
+            const user =  await createUser(username, password);
 
-        const user = new User({
-            username,
-            password
-        })
-
-        const salt = genSaltSync(10);
-        user.password = hashSync(password, salt);
-
-        user.save((err, user) => {
-            if (err) return res.status(500).send(err.message);
-
-            const token = jwt.sign(
-                { _id: user._id, username: user.username },
-                jwtSecret,
-                {
-                    expiresIn: '3d'
-                }
-            )
+            const token = generateJWT(user);
             
             res.status(200).json({user, token});
-        })
+        } catch (err) {
+            res.status(500);
+            if (err instanceof ResourceAlreadyExistsError) res.status(400);
+            
+            res.send({message:err.message});
+        }
     }
 })
 
@@ -43,22 +37,20 @@ router.post('/signin', async (req, res) => {
     const { username, password } = req.body;
 
     if (username && password) {
-        const user = await User.findOne({ username });
+        try {
+            const user = await getUser(username);
+    
+            if (user) {
+                const authenticate = compareSync(password, user.password);
+    
+                const token = generateJWT(user);
 
-        if (user) {
-            const authenticate = compareSync(password, user.password);
-
-            const token = jwt.sign(
-                { _id: user._id, username: user.username },
-                jwtSecret,
-                {
-                    expiresIn: '3d'
-                }
-            )
-            
-            authenticate ? res.status(200).json({user, token}) : res.status(400).json({ error: "Error, wrong password" })
-        } else {
-            return res.status(404).json({ message: 'user not found' });
+                authenticate ? res.status(200).json({user, token}) : res.status(400).json({ error: "Error, wrong password" })
+            } else {
+                return res.status(404).json({ message: 'user not found' });
+            }
+        } catch (error) {
+                res.status(500).json({ message: error.message}); 
         }
     }
 })
