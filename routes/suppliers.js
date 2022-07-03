@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Product from '../db/models/product.js';
 import { createSupplier, getSupplier, getSuppliers, updateSupplier } from '../db/controllers/supplier.js';
 import { ResourceNotFoundError } from '../Errors/errors.js';
+import { createProduct } from '../db/controllers/product.js';
 
 const router = Router();
 
@@ -50,26 +51,25 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.post('/:id/product', (req, res) => {
+router.post('/:id/product', async (req, res) => {
     const supplier = req.params.id;
     const { quantity, name, description } = req.body;
 
-    if (quantity && name) {
+    if (!quantity || !name) return res.status(400).json({ message: 'Should pass product quantity and name' });
 
-        const product = new Product({
-            supplier,
-            quantity,
-            name,
-            description
-        })
+    const product = {
+        supplier,
+        quantity,
+        name,
+        description
+    }
 
-        product.save((err, product) => {
-            if (err) return res.status(500).json({ message: err.message });
+    try {
+        const productSaved = await createProduct(product);
 
-            res.status(200).json(product);
-        });
-    } else {
-        return res.status(400).json({ message: 'Should pass product quantity and name' });
+        res.status(200).json(productSaved);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 })
 
