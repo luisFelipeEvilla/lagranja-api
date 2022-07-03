@@ -1,55 +1,52 @@
 import { Router } from 'express';
-import Supplier from '../db/models/supplier.js';
 import Product from '../db/models/product.js';
+import { createSupplier, getSupplier, getSuppliers, updateSupplier } from '../db/controllers/supplier.js';
+import { ResourceNotFoundError } from '../Errors/errors.js';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-    Supplier.find((err, suppliers) => {
-        if (err) return res.status(500).json({ message: err });
+router.get('/', async (req, res) => {
+    try {
+        const suppliers = await getSuppliers();
 
         res.status(200).json(suppliers);
-    })
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     const _id = req.params.id;
 
-    Supplier.findOne({ _id})
-        .exec((err, supplier) => {
-            if (err) return res.status(500).json({ message: err.message });
+    try {
+        const supplier = await getSupplier(_id);
 
-            if (!supplier) {
-                return res.status(404).json({ message: 'Supplier not found' });
-            }
+        res.status(200).json(supplier);
+    } catch (error) {
+        res.status(500);
+        if (error instanceof ResourceNotFoundError) res.status(404);
 
-            Product.find({supplier: _id})
-                .exec((err, products) => {
-                    if (err) return res.status(500).json({ message: err.message });
-
-                    supplier.products = products;
-
-                    res.status(200).json(supplier);
-                })
-        });
+        res.json({ message: error.message })
+    }
 })
 
-router.post('/', (req, res) => {
-    const { firstName, lastName } = req.body;
+router.post('/', async (req, res) => {
+    const { firstName, lastName, phoneNumber } = req.body;
 
-    if (firstName && lastName) {
-        const supplier = new Supplier({
-            firstName,
-            lastName
-        })
+    if (!firstName || !lastName) return res.status(400).json({ message: 'You should pass a firstName and lastName' })
 
-        supplier.save((err, supplier) => {
-            if (err) return res.status(500).json({ message: err.message });
+    const supplier = {
+        firstName,
+        lastName,
+        phoneNumber
+    };
 
-            res.status(200).json(supplier);
-        })
-    } else {
-        return res.status(400).json({ message: 'You should pass a firstName and lastName' })
+    try {
+        const result = await createSupplier(supplier);
+
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 })
 
@@ -67,7 +64,7 @@ router.post('/:id/product', (req, res) => {
         })
 
         product.save((err, product) => {
-            if (err) return res.status(500).json({ message: err.message});
+            if (err) return res.status(500).json({ message: err.message });
 
             res.status(200).json(product);
         });
@@ -76,29 +73,26 @@ router.post('/:id/product', (req, res) => {
     }
 })
 
-router.put('/', async (req, res) => {
-    const { _id, firstName, lastName } = req.body;
+router.put('/:id', async (req, res) => {
+    const _id = req.params.id;
 
-    if (firstName && lastName) {
-        const supplier = {
-            firstName,
-            lastName
-        }
+    const { firstName, lastName, phoneNumber } = req.body;
 
-        const options = {
-            new: true
-        }
-        Supplier.findOneAndUpdate({ _id }, supplier, options, (err, supplier) => {
-            if (err) return res.status(500).json({ message: err.message });
+    const supplier = {
+        firstName,
+        lastName,
+        phoneNumber
+    };
 
-            if (supplier) {
-                res.status(200).json(supplier);
-            } else {
-                return res.status(404).json({ message: 'Supplier not found' });
-            }
-        });
-    } else {
-        return res.status(400).json({ message: 'You should pass a first name and last name' })
+    try {
+        const updatedSupplier = await updateSupplier(_id, supplier);
+
+        res.status(200).json(updatedSupplier);
+    } catch (error) {
+        res.status(500);
+        if (error instanceof ResourceNotFoundError) res.status(404);
+
+        res.json({ message: error.message });
     }
 });
 

@@ -1,5 +1,5 @@
 import User from '../models/user.js';
-import { genSaltSync, hashSync, compareSync } from 'bcrypt';
+import { genSaltSync, hashSync } from 'bcrypt';
 import { ResourceAlreadyExistsError } from '../../Errors/errors.js';
 
 export const getUser = async (username) => {

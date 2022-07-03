@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import jwt from 'jsonwebtoken';
 import { compareSync } from 'bcrypt';
 
 // data base controllers

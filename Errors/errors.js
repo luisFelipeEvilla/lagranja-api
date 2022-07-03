@@ -3,3 +3,9 @@ export class ResourceAlreadyExistsError extends Error {
         super(message);
     }
 };
+
+export class ResourceNotFoundError extends Error {
+    constructor (message) {
+        super(message);
+    }
+}
