@@ -9,7 +9,6 @@ import { ResourceAlreadyExistsError } from '../Errors/errors.js';
 
 // configuration settings
 import generateJWT from '../utils/generateJWT.js';
-import user from '../db/models/user.js';
 
 const router = Router();
 
@@ -44,7 +43,7 @@ router.post('/signin', async (req, res) => {
     
                 const token = generateJWT(user);
 
-                authenticate ? res.status(200).json({user, token}) : res.status(400).json({ error: "Error, wrong password" })
+                authenticate ? res.status(200).json({user, token}) : res.status(404).json({ message: "Error, wrong password" })
             } else {
                 return res.status(404).json({ message: 'user not found' });
             }

@@ -1,6 +1,7 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express'
 import db from './db/index.js';
+import cors from 'cors';
 
 import users from './routes/users.js';
 import suppliers from './routes/suppliers.js';
@@ -17,6 +18,9 @@ const app = express();
 const require = createRequire(import.meta.url)
 const swaggerFile = require('./swagger-output.json');
 
+app.use(cors({
+    origin: '*'
+}))
 app.use(express.json())
 app.use(express.urlencoded({
     extended: true
