@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import users from './routes/users.js';
 import suppliers from './routes/suppliers.js';
+import collections from './routes/collections.js';
 
 import auth from './middlewares/auth.js';
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({
 
 app.use('/', users);
 app.use('/suppliers', auth, suppliers);
+app.use('/collections', collections);
 app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(SERVER_PORT, () => {

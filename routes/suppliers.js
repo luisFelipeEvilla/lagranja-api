@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import Product from '../db/models/product.js';
 import { createSupplier, getSupplier, getSuppliers, updateSupplier } from '../db/controllers/supplier.js';
 import { ResourceNotFoundError } from '../Errors/errors.js';
 import { createProduct } from '../db/controllers/product.js';
