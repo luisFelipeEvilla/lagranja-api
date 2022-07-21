@@ -6,8 +6,10 @@ import { createProduct } from '../db/controllers/product.js';
 const router = Router();
 
 router.get('/', async (req, res) => {
-    try {
-        const suppliers = await getSuppliers();
+    const { startDate, endDate} = req.query;
+
+    try {    
+        const suppliers = await getSuppliers(startDate, endDate);
 
         res.status(200).json(suppliers);
     } catch (err) {
